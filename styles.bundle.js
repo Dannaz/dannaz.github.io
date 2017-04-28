@@ -35,7 +35,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, "/* You can add global styles to this file, and also import other style files */\nbody {\n  font-family: \"Helvetica Neue\";\n  font-weight: 200 !important;\n  font-size: 20px;\n  color: #34d955 !important;\n}\n", ""]);
+exports.push([module.i, "/* You can add global styles to this file, and also import other style files */\nbody {\n  font-family: \"Helvetica Neue\";\n  font-weight: 300 !important;\n  font-size: 20px;\n  color: #000000;\n  /*color: #34d955 !important;*/\n}\n", ""]);
 
 // exports
 
