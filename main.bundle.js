@@ -361,6 +361,11 @@ var CurrencyComponent = (function () {
         this.DEFAULT_VALUE = 100;
         this.DEFAULT_WALLET = 'RUB';
         this.DEFAULT_UPDATE_INTERVAL = 60000;
+        this.lastUpdatedConverter = {
+            id: 0,
+            walletValue: this.DEFAULT_VALUE,
+            walletName: this.DEFAULT_WALLET
+        };
     }
     CurrencyComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -369,7 +374,7 @@ var CurrencyComponent = (function () {
         var locale$ = this.currencyService.loadWalletsLocalization();
         rates$.subscribe(function () {
             if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_util__["isUndefined"])(_this.converters)) {
-                _this.converters = _this.currencyService.updateConverters(_this.DEFAULT_VALUE, _this.DEFAULT_WALLET);
+                _this.converters = _this.currencyService.updateConverters(_this.lastUpdatedConverter);
             }
         }, function (err) {
             console.log('something gone wrong on rates loading:', err);
@@ -386,11 +391,17 @@ var CurrencyComponent = (function () {
         });
     };
     CurrencyComponent.prototype.onCurrencyInputChange = function (converter) {
-        this.converters = this.currencyService.updateConverters(converter.walletValue, converter.walletName);
+        if (!isNaN(converter.walletValue)) {
+            this.lastUpdatedConverter = converter;
+            this.converters = this.currencyService.updateConverters(converter);
+        }
+        else {
+            this.currencyService.updateConverters(this.lastUpdatedConverter);
+        }
     };
     CurrencyComponent.prototype.addConverter = function () {
         this.currencyService.addConverter();
-        this.currencyService.updateConverters(100, 'RUB');
+        this.currencyService.updateConverters(this.lastUpdatedConverter);
     };
     CurrencyComponent.prototype.updatePopularRates = function (walletName) {
         var _this = this;
@@ -406,7 +417,7 @@ var CurrencyComponent = (function () {
     };
     CurrencyComponent.prototype.onConverterDelete = function (converter) {
         this.currencyService.deleteConverter(converter);
-        this.converters = this.currencyService.updateConverters(converter.walletValue, converter.walletName);
+        this.converters = this.currencyService.updateConverters(converter);
     };
     return CurrencyComponent;
 }());
@@ -488,7 +499,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, "app-currency {\n  width: 100%;\n  /*background-color: yellow;*/\n  //border: 1px solid black;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n}\n.container {\n  width: 320px;\n  margin-right: auto;\n  margin-left: auto;\n  text-align: center;\n  border: 1px solid #dddddd;\n  box-shadow: 0px 0px 10px 6px rgba(170,224,220,1);\n  /*background-color: yellow;*/\n}\nh2 {\n  color: #3cb0fd;\n}\n", ""]);
+exports.push([module.i, "app-currency {\n  width: 100%;\n  /*background-color: yellow;*/\n  //border: 1px solid black;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n}\n.container {\n  width: 320px;\n  margin-right: auto;\n  margin-left: auto;\n  text-align: center;\n  border: 1px solid #dddddd;\n  box-shadow: 0px 0px 10px 6px rgba(170,224,220,1);\n  /*background-color: yellow;*/\n}\n.currency-btn{\n  font-family: \"Helvetica Neue\" !important;\n  font-weight: 200 !important;\n}\nh2 {\n\n  font-weight: 200;\n  /*color: #3cb0fd;*/\n}\n", ""]);
 
 // exports
 
@@ -506,7 +517,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, ".dropdown {\n  position: relative;\n  display: inline-block;\n  width: 100%;\n}\n.dropdown-btn {\n  background: #34d955;\n  background-image: linear-gradient(to bottom, #34d955, #7bb82b);\n  border-radius: 20px;\n  font-family: Arial;\n  color: #ffffff;\n  font-size: 20px;\n  padding: 10px 15px 10px 15px;\n  text-decoration: none;\n}\n\n.dropdown-btn:hover {\n  background: #3cb0fd;\n  background-image: linear-gradient(to bottom, #3cb0fd, #3498db);\n  text-decoration: none;\n}\n.dropdown-btn:after {\n  content: \"\\25BC\";\n  font-size: 15px;\n}\n\n\n.dropdown-content {\n  display: none;\n  padding: 0;\n  margin: 0;\n  right: 0;\n  position: absolute;\n  background-color: #f9f9f9;\n  width: 250px;\n  max-height: 200px;\n  overflow-y: scroll;\n  box-shadow: 5px 5px 12px 1px rgba(60,176,253,1);\n  border-radius: 20px;\n  z-index: 1;\n\n  background:\n    /* Shadow covers */\n    linear-gradient(white 30%, rgba(255,255,255,0)),\n    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,\n\n      /* Shadows */\n    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),\n    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;\n  background-repeat: no-repeat;\n  background-color: white;\n  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;\n\n  /* Opera doesn't support this in the shorthand */\n  background-attachment: local, local, scroll, scroll;\n}\n.dropdown-content__item {\n  color: #3cb0fd;\n  list-style-type: none;\n  padding: 12px 16px;\n  text-decoration: none;\n  display: block;\n  border-bottom: 1px solid #dddddd;\n}\n.dropdown-content__item:hover {\n  background-color: #dddddd;\n}\n.dropdown:hover .dropdown-content{\n  display: block;\n}\n.dropdown:hover .dropdown-btn:after {\n  content: \"\\25B2\";\n  font-size: 15px;\n}\n", ""]);
+exports.push([module.i, ".dropdown {\n  position: relative;\n  display: inline-block;\n  width: 100%;\n}\n.dropdown-btn {\n  background: #34d955;\n  background-image: linear-gradient(to bottom, #34d955, #7bb82b);\n  border-radius: 20px;\n  color: #ffffff;\n  font-size: 20px;\n  padding: 10px 15px 10px 15px;\n  text-decoration: none;\n}\n\n.dropdown-btn:hover {\n  background: #34d955;\n  background-image: linear-gradient(to bottom, #34d955, #01b726);\n  text-decoration: none;\n}\n.dropdown-btn:after {\n  content: \"\\25BC\";\n  font-size: 15px;\n}\n\n\n.dropdown-content {\n  display: none;\n  padding: 0;\n  margin: 0;\n  right: 0;\n  position: absolute;\n  background-color: #f9f9f9;\n  width: 250px;\n  max-height: 200px;\n  overflow-y: scroll;\n  box-shadow: 5px 5px 12px 1px rgba(52, 217, 85, 1);\n  border-radius: 20px;\n  z-index: 1;\n  box-shadow: 0px 0px 10px 0px rgba(52,217,85,1);\n\n  background:\n    /* Shadow covers */\n    linear-gradient(white 30%, rgba(255,255,255,0)),\n    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,\n\n      /* Shadows */\n    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),\n    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;\n  background-repeat: no-repeat;\n  background-color: white;\n  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;\n\n  /* Opera doesn't support this in the shorthand */\n  background-attachment: local, local, scroll, scroll;\n}\n.dropdown-content__item {\n  /*color: #3cb0fd;*/\n  list-style-type: none;\n  padding: 12px 16px;\n  text-decoration: none;\n  display: block;\n  border-bottom: 1px solid #dddddd;\n}\n.dropdown-content__item:hover {\n  background-color: #f2fff4;\n}\n.dropdown:hover .dropdown-content{\n  display: block;\n}\n.dropdown:hover .dropdown-btn:after {\n  content: \"\\25B2\";\n  font-size: 15px;\n}\n", ""]);
 
 // exports
 
@@ -524,7 +535,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, "p {\n  display: block;\n  color: #3cb0fd;\n}\n.currency-list {\n  list-style-type: none;\n  list-style-position: outside;\n  -webkit-padding-start: 0;\n  width: 300px;\n}\n.currency-list__item {\n  padding: 10px;\n  border-bottom: 2px solid #dddddd;\n  text-align: center;\n}\n\n.currency-info__header,\n.currency-info__list {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n}\n.currency-list__item {\n  color: #3cb0fd;\n}\napp-currency-dropdown {\n  width: 50%;\n}\n.currency-wallet {\n  float: left;\n  text-align: left;\n}\n.currency-type-toggler {\n  margin-top: 10px;\n  color: #3cb0fd;\n  font-size: 25px;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n}\n\n.switch {\n  position: relative;\n  display: inline-block;\n  width: 60px;\n  height: 34px;\n  padding-bottom: 0;\n  margin: 0 10px;\n}\n.switch input {display:none;}\n.slider {\n  position: absolute;\n  cursor: pointer;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background-color: #34d955;\n  transition: .4s;\n}\n.slider:before {\n  position: absolute;\n  content: \"\";\n  height: 26px;\n  width: 26px;\n  left: 4px;\n  bottom: 4px;\n  background-color: white;\n  transition: .4s;\n}\ninput:checked + .slider {\n  background-color: #3cb0fd;\n}\ninput:focus + .slider {\n  box-shadow: 0 0 1px #3cb0fd;\n}\ninput:checked + .slider:before {\n  -webkit-transform: translateX(26px);\n  transform: translateX(26px);\n}\n.slider.round {\n  border-radius: 34px;\n}\n.slider.round:before {\n  border-radius: 50%;\n}\n.currency {\n  opacity: 0.5;\n}\n.targeted-currency {\n  opacity: 1.0;\n}\n", ""]);
+exports.push([module.i, "p {\n  display: block;\n  //color: #3cb0fd;\n}\n.currency-list {\n  list-style-type: none;\n  list-style-position: outside;\n  -webkit-padding-start: 0;\n  width: 300px;\n}\n.currency-list__item {\n  padding: 10px;\n  border-bottom: 2px solid #dddddd;\n  text-align: center;\n}\n\n.currency-info__header,\n.currency-info__list {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n}\n.currency-list__item {\n  color: #34d955;\n}\napp-currency-dropdown {\n  width: 50%;\n}\n.currency-wallet {\n  float: left;\n  text-align: left;\n}\n.currency-type-toggler {\n  margin-top: 10px;\n  //color: #3cb0fd;\n  font-size: 25px;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n}\n\n.switch {\n  position: relative;\n  display: inline-block;\n  width: 60px;\n  height: 34px;\n  padding-bottom: 0;\n  margin: 0 10px;\n}\n.switch input {display:none;}\n.slider {\n  position: absolute;\n  cursor: pointer;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background-color: #34d955;\n  transition: .4s;\n}\n.slider:before {\n  position: absolute;\n  content: \"\";\n  height: 26px;\n  width: 26px;\n  left: 4px;\n  bottom: 4px;\n  background-color: white;\n  transition: .4s;\n}\ninput:checked + .slider {\n  background-color: #01b726;\n}\ninput:focus + .slider {\n  box-shadow: 0 0 1px #01b726;\n}\ninput:checked + .slider:before {\n  -webkit-transform: translateX(26px);\n  transform: translateX(26px);\n}\n.slider.round {\n  border-radius: 34px;\n}\n.slider.round:before {\n  border-radius: 50%;\n}\n.currency {\n  opacity: 0.5;\n}\n.targeted-currency {\n  opacity: 1.0;\n}\n", ""]);
 
 // exports
 
@@ -542,7 +553,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, ".currency-input {\n  width: 100%;\n  height: 100%;\n  //border: 1px solid #0a0ed6;\n  background-image: linear-gradient(to bottom, #8efff9, #7fe2dd);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-input__input {\n  width: 60%;\n  /*background-color: red;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n\n\n}\n.currency-input__input input {\n  width: 90%;\n  height: 40px;\n  border: transparent;\n  border: 2px solid #34d955;\n  border-radius: 20px;\n  font-size: 25px;\n  color: #3cb0fd;\n  text-align: center;\n}\n.currency-input__input input::-moz-selection {\n  background-color: #ffdd2d;\n}\n.currency-input__input input::selection {\n  background-color: #ffdd2d;\n}\ninput:focus {\n  outline: none;\n}\n.currency-input__dropdown {\n  width: 30%;\n  height: 100%;\n  min-width: 96px;\n  /*background-color: blue;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-input__delete-btn {\n  width: 10%;\n  min-width: 32px;\n  //background-color: blue;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  opacity: 0.2;\n}\n.currency-input__delete-btn:hover {\n  opacity: 1;\n}\n.delete-btn-hidden {\n  display: none !important;\n}\napp-currency-dropdown {\n  width: 90%;\n  /*background-color: purple;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n", ""]);
+exports.push([module.i, ".currency-input {\n  width: 95%;\n  height: 90%;\n  box-shadow: 0px 0px 10px 0px rgba(52,217,85,1);\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-input__input {\n  width: 60%;\n  /*background-color: red;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-input__input input {\n  width: 90%;\n  height: 40px;\n  border: transparent;\n  border: 2px solid #34d955;\n  border-radius: 20px;\n  font-size: 25px;\n  color: #34d955;\n  /*color: #3cb0fd;*/\n  text-align: center;\n}\n.currency-input__input input::-moz-selection {\n  background-color: #ffdd2d;\n}\n.currency-input__input input::selection {\n  background-color: #ffdd2d;\n}\ninput:focus {\n  outline: none;\n}\n.currency-input__dropdown {\n  width: 30%;\n  height: 100%;\n  min-width: 96px;\n  /*background-color: blue;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-input__delete-btn {\n  width: 10%;\n  min-width: 32px;\n  //background-color: blue;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n  opacity: 0.2;\n}\n.currency-input__delete-btn:hover {\n  opacity: 1;\n}\n.delete-btn-hidden {\n  display: none !important;\n}\napp-currency-dropdown {\n  width: 90%;\n  /*background-color: purple;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n", ""]);
 
 // exports
 
@@ -560,7 +571,7 @@ exports = module.exports = __webpack_require__(26)();
 
 
 // module
-exports.push([module.i, "app-currency-input {\n  width: 100%;\n  height: 60px;\n  /*background-color: yellow;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-btn {\n  background: #34d955;\n  background-image: linear-gradient(to bottom, #34d955, #7bb82b);\n  border-radius: 20px;\n  font-family: Arial;\n  color: #ffffff;\n  font-size: 20px;\n  margin: 20px auto;\n  outline: none;\n  padding: 10px 15px 10px 15px;\n  text-decoration: none;\n  border-color: transparent;\n}\n.spinner {\n  width: 100px;\n  margin-left: auto;\n  margin-right: auto;\n}\n", ""]);
+exports.push([module.i, "app-currency-input {\n  width: 100%;\n  height: 60px;\n  /*background-color: yellow;*/\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.currency-btn {\n  background: #34d955;\n  background-image: linear-gradient(to bottom, #34d955, #7bb82b);\n  border-radius: 20px;\n  /*font-family: Arial;*/\n  font-family: \"Helvetica Neue\";\n  font-weight: 200;\n  color: #ffffff;\n  font-size: 20px;\n  margin: 20px auto;\n  outline: none;\n  padding: 10px 15px 10px 15px;\n  text-decoration: none;\n  border-color: transparent;\n}\n.spinner {\n  width: 100px;\n  margin-left: auto;\n  margin-right: auto;\n}\n", ""]);
 
 // exports
 
@@ -573,7 +584,7 @@ module.exports = module.exports.toString();
 /***/ 208:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"container\">\n  <h2>Конвертер валют</h2>\n  <app-currency></app-currency>\n</div>\n\n"
+module.exports = "<div class=\"container\">\n  <h2>Конвертер валют</h2>\n  <app-currency></app-currency>\n</div>\n"
 
 /***/ }),
 
@@ -587,7 +598,7 @@ module.exports = "<div class=\"dropdown\" (click)=\"onItemClick($event.target)\"
 /***/ 210:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"currency-info\">\n  <div class=\"currency-info__header\">\n    <p>\n      Курсы валют по отношению к\n    </p>\n      <app-currency-dropdown\n        [currency]=\"currency\"\n        [currentCurrency]=\"currentCurrency\"\n        (currencyChange)=\"onCurrencyChange($event)\"\n      ></app-currency-dropdown>\n  </div>\n  <div class=\"currency-info__list\">\n    <div class=\"currency-type-toggler\">\n      Покупка\n      <label class=\"switch\">\n        <input type=\"checkbox\" checked (change)=\"onChange($event)\">\n        <div class=\"slider round\"></div>\n      </label>\n      Продажа\n    </div>\n    <ul class=\"currency-list\">\n      <li\n        class=\"currency-list__item\"\n        *ngFor=\"let rate of popularRates\"\n      >\n        <span class=\"currency-wallet\">{{rate?.base}}</span>\n        <span\n          class=\"currency\"\n          [class.targeted-currency]=\"!isSell()\"\n        >{{(rate?.rates * 0.99).toFixed(2)}}\n        </span>\n        /\n        <span\n          class=\"currency\"\n          [class.targeted-currency]=\"isSell()\"\n        >{{(rate.rates * 1.01 ).toFixed(2)}}\n        </span>\n      </li>\n    </ul>\n  </div>\n</div>\n"
+module.exports = "<div class=\"currency-info\">\n  <div class=\"currency-info__header\">\n    <p>\n      Курсы валют по отношению к\n    </p>\n      <app-currency-dropdown\n        [currency]=\"currency\"\n        [currentCurrency]=\"currentCurrency\"\n        (currencyChange)=\"onCurrencyChange($event)\"\n      ></app-currency-dropdown>\n  </div>\n  <div class=\"currency-info__list\">\n    <div class=\"currency-type-toggler\">\n      Покупка\n      <label class=\"switch\">\n        <input type=\"checkbox\" checked (change)=\"onChange($event)\">\n        <div class=\"slider round\"></div>\n      </label>\n      Продажа\n    </div>\n    <ul class=\"currency-list\">\n      <li\n        class=\"currency-list__item\"\n        *ngFor=\"let rate of popularRates\"\n      >\n        <span class=\"currency-wallet\">{{rate?.base}}</span>\n        <span\n          class=\"currency\"\n          [class.targeted-currency]=\"!isSell()\"\n        >{{(rate?.rates * 0.99).toFixed(3)}}\n        </span>\n        /\n        <span\n          class=\"currency\"\n          [class.targeted-currency]=\"isSell()\"\n        >{{(rate.rates * 1.01 ).toFixed(3)}}\n        </span>\n      </li>\n    </ul>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -762,7 +773,7 @@ var CurrencyService = (function () {
                 return wallet.walletName !== myWallet;
             })
                 .map(function (wallet) {
-                return BASE_URL + "/latest?base=" + wallet.walletName + "&symbols=" + myWallet;
+                return BASE_URL + "/latest?base=" + myWallet + "&symbols=" + wallet.walletName;
             });
             var requests = urls.map(function (url) {
                 return _this.http.get(url)
@@ -773,22 +784,22 @@ var CurrencyService = (function () {
             return __WEBPACK_IMPORTED_MODULE_8_rxjs__["Observable"].combineLatest(requests);
         })
             .do(function (rates) {
-            var muteRates = Object.keys(rates)
-                .map(function (key) {
-                return Object.assign(rates[key], { rates: rates[key].rates[myWallet] });
+            Object.keys(rates).map(function (key) {
+                var wallets = Object.keys(rates[key].rates);
+                return Object.assign(rates[key], { base: wallets[0] }, { rates: rates[key].rates[wallets[0]] });
             });
             _this.cachedRates.push(Object.assign({}, { base: myWallet }, { rates: rates }));
         });
         return CurrencyRatesRequest$;
     };
-    CurrencyService.prototype.updateConverters = function (value, wallet) {
+    CurrencyService.prototype.updateConverters = function (updateWith) {
         var _this = this;
         if (!this.converters) {
             this.converters = this.getConverters();
         }
         this.converters
             .map(function (converter) {
-            converter.walletValue = _this.convertValue(value, wallet, converter.walletName);
+            converter.walletValue = _this.convertValue(updateWith.walletValue, updateWith.walletName, converter.walletName);
         });
         this.saveConverters();
         return this.converters;
